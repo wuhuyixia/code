@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.DS_Store
+
+# Datasets and generated experiment artifacts
+data_cache/
+results/
+run_logs/
+
+# Checkpoints and tensor caches
+*.pt
+*.pth
+*.ckpt

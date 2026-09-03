@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .autograd import AutogradEstimator
 from .oprf import OPRFEstimator
-from . import zeroth_order
+from .zeroth_order import TwoPointEstimator
 
 
 def _require(cfg: dict, key: str):
@@ -13,7 +13,10 @@ def _require(cfg: dict, key: str):
 
 
 def build_estimator(cfg: dict, *, seed: int | None = None):
-    name = cfg.get("name", "autograd").lower()
+    name = cfg.get("name")
+    if name is None:
+        raise ValueError("Missing required estimator configuration: name")
+    name = str(name).lower()
     if name == "autograd":
         return AutogradEstimator()
     if name == "oprf":
@@ -23,5 +26,8 @@ def build_estimator(cfg: dict, *, seed: int | None = None):
             seed=seed,
         )
     if name in {"zeroth_order", "two_point", "zo"}:
-        return zeroth_order
+        return TwoPointEstimator(
+            smoothing=float(_require(cfg, "smoothing")),
+            seed=seed,
+        )
     raise ValueError(f"Unknown estimator: {name}")

@@ -9,14 +9,22 @@ experiment:
 data:
   dataset: null
   root: data_cache
+  download: false
   partition: null
   num_clients: null
   dirichlet_alpha: null
   val_fraction: null
+  image_size: null
+  to_tensor: true
+  normalize_mean: null
+  normalize_std: null
+  crop_roi: true
 
 model:
   name: null
   num_classes: null
+  in_channels: null
+  input_dim: null
 
 training:
   optimizer: null
@@ -26,16 +34,19 @@ training:
   eval_batch_size: null
   local_epochs: null
   weight_decay: null
+  num_workers: 0
 
 estimator:
   name: null
   delta: null
   init_mode: null
+  smoothing: null
 
 attack:
   name: none
   malicious_clients: []
   start_round: null
+  target: null
   sign_scale: null
   gaussian_std: null
 

@@ -1,52 +1,52 @@
 experiment:
-  name: baseline
-  seed: 42
+  name: null
+  seed: null
   device: auto
-  rounds: 100
+  rounds: null
   output_dir: results
   log_dir: run_logs
 
 data:
-  dataset: mnist
+  dataset: null
   root: data_cache
-  partition: dirichlet
-  num_clients: 12
-  dirichlet_alpha: 0.5
-  val_fraction: 0.1
+  partition: null
+  num_clients: null
+  dirichlet_alpha: null
+  val_fraction: null
 
 model:
-  name: cnn
-  num_classes: 10
+  name: null
+  num_classes: null
 
 training:
-  optimizer: sgd
-  lr: 0.01
-  momentum: 0.9
-  batch_size: 64
-  eval_batch_size: 512
-  local_epochs: 1
-  weight_decay: 0.0
+  optimizer: null
+  lr: null
+  momentum: null
+  batch_size: null
+  eval_batch_size: null
+  local_epochs: null
+  weight_decay: null
 
 estimator:
-  name: autograd
-  delta: 0.001
-  init_mode: one_point
+  name: null
+  delta: null
+  init_mode: null
 
 attack:
   name: none
   malicious_clients: []
-  start_round: 1
-  sign_scale: 5.0
-  gaussian_std: 1.0
+  start_round: null
+  sign_scale: null
+  gaussian_std: null
 
 aggregation:
-  name: dfedavg
-  assumed_f: 2
-  trim_ratio: 0.2
+  name: null
+  assumed_f: null
+  trim_ratio: null
 
 network:
-  topology: complete
+  topology: null
   self_loop: true
-  neighbors_per_node: 6
+  neighbors_per_node: null
   dynamic: false
-  switch_interval: 20
+  switch_interval: null

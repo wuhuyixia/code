@@ -29,6 +29,8 @@ training:
 
 estimator:
   name: autograd
+  delta: 0.001
+  init_mode: one_point
 
 attack:
   name: none

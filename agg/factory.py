@@ -14,5 +14,6 @@ def build_aggregator(cfg: dict):
         r = float(cfg.get("trim_ratio", 0.2))
         return lambda updates, **kwargs: trimmed_mean.aggregate(updates, r)
     if name in {"algorithm1", "algorithm_1"}:
-        return algorithm1.aggregate
+        f = int(cfg.get("assumed_f", cfg.get("f", 2)))
+        return lambda updates, **kwargs: algorithm1.aggregate(updates, f=f, **kwargs)
     raise ValueError(f"Unknown aggregator: {name}")

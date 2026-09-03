@@ -10,25 +10,28 @@ from .base import BaseGradientEstimator, GradientEstimate
 
 
 class OPRFEstimator(BaseGradientEstimator):
-    """One-Point Residual Feedback (OPRF) zeroth-order gradient estimator.
+    """One-Point Residual Feedback zeroth-order gradient estimator.
 
-    For client i at estimator iteration t,
+    Core form
+    ---------
+    y_t = f(x_t + delta_t u_t)
+    g_t = (y_t - y_{t-1}) / delta_t * u_t
 
-        y_t = f(x_t + delta_t u_t),
-        g_t = (y_t - y_{t-1}) / delta_t * u_t,
-        u_t ~ N(0, I).
+    Only one new objective evaluation is performed per call. Residual history
+    and random-number streams are stored independently for each client.
 
-    Only one new objective evaluation is required per call.  Residual history is
-    stored independently for every client so that decentralized trajectories do
-    not share function values.
+    This module intentionally contains no manuscript-specific numerical values.
+    The smoothing parameter and initialization mode must be supplied explicitly
+    by the experiment configuration.
     """
 
     name = "oprf"
 
     def __init__(
         self,
-        delta: float = 1e-3,
-        init_mode: str = "one_point",
+        *,
+        delta: float,
+        init_mode: str,
         seed: Optional[int] = None,
     ) -> None:
         if delta <= 0:
@@ -36,8 +39,8 @@ class OPRFEstimator(BaseGradientEstimator):
         if init_mode not in {"one_point", "zero"}:
             raise ValueError("init_mode must be 'one_point' or 'zero'.")
 
-        self.default_delta = float(delta)
-        self.init_mode = init_mode
+        self.delta = float(delta)
+        self.init_mode = str(init_mode)
         self.seed = seed
         self._prev_values: dict[int, torch.Tensor] = {}
         self._iterations: dict[int, int] = {}
@@ -49,17 +52,11 @@ class OPRFEstimator(BaseGradientEstimator):
         key = (int(client_id), str(device))
         if key not in self._generators:
             generator = torch.Generator(device=device)
-            # Deterministic but independent stream for each client.
             generator.manual_seed(int(self.seed) + 1_000_003 * int(client_id))
             self._generators[key] = generator
         return self._generators[key]
 
-    def _sample_direction(
-        self,
-        x: torch.Tensor,
-        *,
-        client_id: int,
-    ) -> torch.Tensor:
+    def _sample_direction(self, x: torch.Tensor, *, client_id: int) -> torch.Tensor:
         return torch.randn(
             x.shape,
             dtype=x.dtype,
@@ -79,7 +76,7 @@ class OPRFEstimator(BaseGradientEstimator):
         batch_id: int,
     ) -> GradientEstimate:
         client_id = int(client_id)
-        delta_t = self.default_delta
+        delta_t = self.delta
 
         x_batch, y_batch = batch
         x_batch = x_batch.to(device, non_blocking=True)
@@ -92,8 +89,6 @@ class OPRFEstimator(BaseGradientEstimator):
         direction = self._sample_direction(x, client_id=client_id)
         query_point = x + delta_t * direction
 
-        # Evaluate exactly one new function value at the perturbed model and
-        # always restore the unperturbed local model afterwards.
         try:
             with torch.no_grad():
                 vector_to_parameters(query_point, model)
@@ -107,7 +102,10 @@ class OPRFEstimator(BaseGradientEstimator):
             current_value,
             device=x.device,
             dtype=x.dtype,
-        ).reshape(())
+        )
+        if current_value.numel() != 1:
+            raise ValueError("The objective function must return one scalar loss value.")
+        current_value = current_value.reshape(())
 
         previous_value = self._prev_values.get(client_id)
         if previous_value is None:
@@ -162,7 +160,7 @@ class OPRFEstimator(BaseGradientEstimator):
 
     def state_dict(self) -> dict:
         return {
-            "default_delta": self.default_delta,
+            "delta": self.delta,
             "init_mode": self.init_mode,
             "seed": self.seed,
             "prev_values": {
@@ -173,7 +171,7 @@ class OPRFEstimator(BaseGradientEstimator):
         }
 
     def load_state_dict(self, state: dict) -> None:
-        self.default_delta = float(state["default_delta"])
+        self.delta = float(state["delta"])
         self.init_mode = str(state["init_mode"])
         self.seed = state.get("seed")
         self._prev_values = {

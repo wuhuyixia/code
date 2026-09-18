@@ -1,0 +1,41 @@
+{
+  "title": "Software for Byzantine-Resilient Decentralized Online Federated Learning with Bandit Feedback for IoV Networks",
+  "upload_type": "software",
+  "access_right": "open",
+  "version": "1.0.0",
+  "language": "eng",
+  "creators": [
+    {
+      "name": "Guo, Guixiang",
+      "affiliation": "School of Computer Science and Technology, Shandong Xiehe University, Jinan 250109, China"
+    },
+    {
+      "name": "Zhao, Lin",
+      "affiliation": "School of Computer Science and Technology, Shandong Xiehe University, Jinan 250109, China"
+    },
+    {
+      "name": "Chen, Shuai",
+      "affiliation": "School of Automation, Nanjing University of Information Science and Technology, Nanjing 210044, China"
+    },
+    {
+      "name": "Zhang, Fu",
+      "affiliation": "School of Automation, Nanjing University of Information Science and Technology, Nanjing 210044, China"
+    },
+    {
+      "name": "Fang, Jihua",
+      "affiliation": "School of Automation, Nanjing University of Information Science and Technology, Nanjing 210044, China"
+    },
+    {
+      "name": "Zhang, Wenhua",
+      "affiliation": "School of Computer Science and Technology, Shandong Xiehe University, Jinan 250109, China"
+    }
+  ],
+  "keywords": [
+    "decentralized federated learning",
+    "Byzantine resilience",
+    "bandit feedback",
+    "Internet of Vehicles",
+    "online federated learning",
+    "zeroth-order optimization"
+  ]
+}
